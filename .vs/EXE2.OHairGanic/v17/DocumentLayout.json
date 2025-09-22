@@ -1,0 +1,75 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\acer\\Desktop\\123\\Cn8\\EXE201\\EXE2.OHairGanic\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{3E2EBA37-4551-4F7E-84DD-ACB2357CFFCD}|OHairGanic.API\\OHairGanic.API.csproj|c:\\users\\acer\\desktop\\123\\cn8\\exe201\\exe2.ohairganic\\ohairganic.api\\middlewares\\globalexceptionmiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{3E2EBA37-4551-4F7E-84DD-ACB2357CFFCD}|OHairGanic.API\\OHairGanic.API.csproj|solutionrelative:ohairganic.api\\middlewares\\globalexceptionmiddleware.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{3E2EBA37-4551-4F7E-84DD-ACB2357CFFCD}|OHairGanic.API\\OHairGanic.API.csproj|c:\\users\\acer\\desktop\\123\\cn8\\exe201\\exe2.ohairganic\\ohairganic.api\\ohairganic.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
+      "RelativeMoniker": "D:0:0:{3E2EBA37-4551-4F7E-84DD-ACB2357CFFCD}|OHairGanic.API\\OHairGanic.API.csproj|solutionrelative:ohairganic.api\\ohairganic.api.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{19992C33-2001-42DB-965A-03CE23273AD8}|OHairGanic.DAL\\OHairGanic.DAL.csproj|c:\\users\\acer\\desktop\\123\\cn8\\exe201\\exe2.ohairganic\\ohairganic.dal\\repositories\\implementations\\genericrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{19992C33-2001-42DB-965A-03CE23273AD8}|OHairGanic.DAL\\OHairGanic.DAL.csproj|solutionrelative:ohairganic.dal\\repositories\\implementations\\genericrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 2,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "OHairGanic.API",
+              "DocumentMoniker": "C:\\Users\\acer\\Desktop\\123\\Cn8\\EXE201\\EXE2.OHairGanic\\OHairGanic.API\\OHairGanic.API.csproj",
+              "RelativeDocumentMoniker": "OHairGanic.API\\OHairGanic.API.csproj",
+              "ToolTip": "C:\\Users\\acer\\Desktop\\123\\Cn8\\EXE201\\EXE2.OHairGanic\\OHairGanic.API\\OHairGanic.API.csproj",
+              "RelativeToolTip": "OHairGanic.API\\OHairGanic.API.csproj",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000758|",
+              "WhenOpened": "2025-09-22T03:05:17.755Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "GlobalExceptionMiddleware.cs",
+              "DocumentMoniker": "C:\\Users\\acer\\Desktop\\123\\Cn8\\EXE201\\EXE2.OHairGanic\\OHairGanic.API\\Middlewares\\GlobalExceptionMiddleware.cs",
+              "RelativeDocumentMoniker": "OHairGanic.API\\Middlewares\\GlobalExceptionMiddleware.cs",
+              "ToolTip": "C:\\Users\\acer\\Desktop\\123\\Cn8\\EXE201\\EXE2.OHairGanic\\OHairGanic.API\\Middlewares\\GlobalExceptionMiddleware.cs",
+              "RelativeToolTip": "OHairGanic.API\\Middlewares\\GlobalExceptionMiddleware.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABsAAAAoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-22T03:05:46.158Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "GenericRepository.cs",
+              "DocumentMoniker": "C:\\Users\\acer\\Desktop\\123\\Cn8\\EXE201\\EXE2.OHairGanic\\OHairGanic.DAL\\Repositories\\Implementations\\GenericRepository.cs",
+              "RelativeDocumentMoniker": "OHairGanic.DAL\\Repositories\\Implementations\\GenericRepository.cs",
+              "ToolTip": "C:\\Users\\acer\\Desktop\\123\\Cn8\\EXE201\\EXE2.OHairGanic\\OHairGanic.DAL\\Repositories\\Implementations\\GenericRepository.cs",
+              "RelativeToolTip": "OHairGanic.DAL\\Repositories\\Implementations\\GenericRepository.cs",
+              "ViewState": "AgIAAEEAAAAAAAAAAAAkwBEAAAAyAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2025-09-22T03:01:42.726Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
