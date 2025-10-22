@@ -1,0 +1,17 @@
+C:\Users\acer\Desktop\123\Cn8\EXE201\OHairGanicBE\OHairGanic.BLL\bin\Debug\net8.0\OHairGanic.BLL.deps.json
+C:\Users\acer\Desktop\123\Cn8\EXE201\OHairGanicBE\OHairGanic.BLL\bin\Debug\net8.0\OHairGanic.BLL.dll
+C:\Users\acer\Desktop\123\Cn8\EXE201\OHairGanicBE\OHairGanic.BLL\bin\Debug\net8.0\OHairGanic.BLL.pdb
+C:\Users\acer\Desktop\123\Cn8\EXE201\OHairGanicBE\OHairGanic.BLL\bin\Debug\net8.0\OHairGanic.DAL.dll
+C:\Users\acer\Desktop\123\Cn8\EXE201\OHairGanicBE\OHairGanic.BLL\bin\Debug\net8.0\OHairGanic.DTO.dll
+C:\Users\acer\Desktop\123\Cn8\EXE201\OHairGanicBE\OHairGanic.BLL\bin\Debug\net8.0\OHairGanic.DAL.pdb
+C:\Users\acer\Desktop\123\Cn8\EXE201\OHairGanicBE\OHairGanic.BLL\bin\Debug\net8.0\OHairGanic.DTO.pdb
+C:\Users\acer\Desktop\123\Cn8\EXE201\OHairGanicBE\OHairGanic.BLL\obj\Debug\net8.0\OHairGanic.BLL.csproj.AssemblyReference.cache
+C:\Users\acer\Desktop\123\Cn8\EXE201\OHairGanicBE\OHairGanic.BLL\obj\Debug\net8.0\OHairGanic.BLL.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\acer\Desktop\123\Cn8\EXE201\OHairGanicBE\OHairGanic.BLL\obj\Debug\net8.0\OHairGanic.BLL.AssemblyInfoInputs.cache
+C:\Users\acer\Desktop\123\Cn8\EXE201\OHairGanicBE\OHairGanic.BLL\obj\Debug\net8.0\OHairGanic.BLL.AssemblyInfo.cs
+C:\Users\acer\Desktop\123\Cn8\EXE201\OHairGanicBE\OHairGanic.BLL\obj\Debug\net8.0\OHairGanic.BLL.csproj.CoreCompileInputs.cache
+C:\Users\acer\Desktop\123\Cn8\EXE201\OHairGanicBE\OHairGanic.BLL\obj\Debug\net8.0\OHairGan.F2CCD3D6.Up2Date
+C:\Users\acer\Desktop\123\Cn8\EXE201\OHairGanicBE\OHairGanic.BLL\obj\Debug\net8.0\OHairGanic.BLL.dll
+C:\Users\acer\Desktop\123\Cn8\EXE201\OHairGanicBE\OHairGanic.BLL\obj\Debug\net8.0\refint\OHairGanic.BLL.dll
+C:\Users\acer\Desktop\123\Cn8\EXE201\OHairGanicBE\OHairGanic.BLL\obj\Debug\net8.0\OHairGanic.BLL.pdb
+C:\Users\acer\Desktop\123\Cn8\EXE201\OHairGanicBE\OHairGanic.BLL\obj\Debug\net8.0\ref\OHairGanic.BLL.dll

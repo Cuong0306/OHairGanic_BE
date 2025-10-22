@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ML.OnnxRuntime" Version="1.23.1" />
+    <PackageReference Include="Microsoft.ML.TensorFlow" Version="4.0.2" />
+    <PackageReference Include="OnnxStack.Core" Version="0.39.0" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\OHairGanic.DAL\OHairGanic.DAL.csproj" />
+  </ItemGroup>
+
+</Project>
