@@ -50,5 +50,48 @@ namespace OHairGanic.DAL.Implementations
                 .ToListAsync();
         }
 
+        public async Task<List<Order>> GetOrdersByUserIdAsync(int userId)
+        {
+            return await _context.Orders
+                .Include(o => o.OrderDetails)
+                    .ThenInclude(d => d.Product)
+                .Include(o => o.Payments)
+                .Include(o => o.User)
+                .Where(o => o.UserId == userId)
+                .OrderByDescending(o => o.CreatedAt)
+                .ToListAsync();
+        }
+        public async Task<List<Order>> GetOrdersByUserIdAndPaidAsync(int userId)
+        {
+            return await _context.Orders
+                .Include(o => o.OrderDetails).ThenInclude(d => d.Product)
+                .Include(o => o.Payments)
+                .Include(o => o.User)
+                .Where(o => o.UserId == userId && o.Payments.Any(p => p.Status == "PAID"))
+                .OrderByDescending(o => o.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<List<Order>> GetOrdersByUserIdAndUnpaidAsync(int userId)
+        {
+            return await _context.Orders
+                .Include(o => o.OrderDetails).ThenInclude(d => d.Product)
+                .Include(o => o.Payments)
+                .Include(o => o.User)
+                .Where(o => o.UserId == userId && !o.Payments.Any(p => p.Status == "PAID"))
+                .OrderByDescending(o => o.CreatedAt)
+                .ToListAsync();
+        }
+        public async Task<List<Order>> GetOrdersByUserIdAndCancelledAsync(int userId)
+        {
+            return await _context.Orders
+                .Include(o => o.OrderDetails).ThenInclude(d => d.Product)
+                .Include(o => o.Payments)
+                .Include(o => o.User)
+                .Where(o => o.UserId == userId && o.Status == "CANCELLED")
+                .OrderByDescending(o => o.CreatedAt)
+                .ToListAsync();
+        }
+
     }
 }

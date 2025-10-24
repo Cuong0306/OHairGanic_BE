@@ -51,5 +51,43 @@ namespace OHairGanic.DAL.Implementations
                 .Include(a => a.Capture)
                 .FirstOrDefaultAsync(c => c.Id == analyzeId);
         }
+        public async Task<List<Analysis>> GetDailyAnalysesAsync(int userId, DateTime start, DateTime end)
+        {
+            return await _context.Analyses
+                .Include(a => a.Capture)
+                .Where(a => a.Capture.UserId == userId &&
+                            a.CreatedAt >= start &&
+                            a.CreatedAt < end)
+                .OrderByDescending(a => a.CreatedAt)
+                .ToListAsync();
+        }
+        public async Task<List<Analysis>> GetAnalysesByUserIdAsync(int userId)
+        {
+            return await _context.Analyses
+                .Include(a => a.Capture)
+                .Where(a => a.Capture.UserId == userId)
+                .OrderByDescending(a => a.CreatedAt)
+                .ToListAsync();
+        }
+        public async Task<List<Analysis>> GetAnalysesByUserInRangeAsync(int userId, DateTime start, DateTime end)
+        {
+            return await _context.Analyses
+                .Include(a => a.Capture)
+                .Where(a => a.Capture.UserId == userId &&
+                            a.CreatedAt >= start && a.CreatedAt < end)
+                .OrderByDescending(a => a.CreatedAt)
+                .ToListAsync();
+        }
+
+        public async Task<List<Analysis>> GetAnalysesInRangeAsync(DateTime start, DateTime end)
+        {
+            return await _context.Analyses
+                .Include(a => a.Capture)
+                .Where(a => a.CreatedAt >= start && a.CreatedAt < end)
+                .OrderByDescending(a => a.CreatedAt)
+                .ToListAsync();
+        }
+
     }
 }
+

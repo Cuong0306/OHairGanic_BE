@@ -13,5 +13,7 @@ namespace OHairGanic.BLL.Implementations
         Task<PaymentResponse> GetPaymentByIdAsync(int id);
         Task<PaymentResponse> CreatePaymentAsync(int orderId);
 
+        Task<List<PaymentResponse>> GetAllPaymentsAsync();
+        Task<List<PaymentResponse>> GetPaymentsByOrderIdAsync(int orderId);
     }
 }

@@ -18,6 +18,15 @@ namespace OHairGanic.BLL.Implementations
             _unitOfWork = unitOfWork;
         }
 
+        // Helper: chọn payment “chính” (ưu tiên đã thanh toán, nếu không có thì mới tạo nhất)
+        private static Payment? SelectPrimaryPayment(IEnumerable<Payment> payments)
+        {
+            return payments?
+                .OrderByDescending(p => p.PaidAt ?? DateTime.MinValue)
+                .ThenByDescending(p => p.CreatedAt)
+                .FirstOrDefault();
+        }
+
         public async Task<OrderResponse> CreateOrderAsync(CreateOrderRequest dto, int userId)
         {
             if (dto.Items == null || dto.Items.Count == 0)
@@ -86,6 +95,7 @@ namespace OHairGanic.BLL.Implementations
                 CreatedAt = order.CreatedAt,
                 TotalAmount = totalAmount,
                 PaymentStatus = payment.Status,
+                Provider = payment.Provider, // 🆕 trả thêm provider ngay khi tạo
                 Details = order.OrderDetails.Select(d => new OrderDetailResponse
                 {
                     ProductId = d.ProductId,
@@ -100,7 +110,9 @@ namespace OHairGanic.BLL.Implementations
         {
             var order = await _unitOfWork.Orders.GetOrderByIdAsync(id);
             if (order == null)
-                throw new Exception("Order not found.");
+                throw new KeyNotFoundException("Order not found."); // 🆕 để Controller trả 404
+
+            var payment = SelectPrimaryPayment(order.Payments);
 
             return new OrderResponse
             {
@@ -110,7 +122,8 @@ namespace OHairGanic.BLL.Implementations
                 Status = order.Status,
                 CreatedAt = order.CreatedAt,
                 TotalAmount = order.OrderDetails.Sum(d => d.Price * d.Quantity),
-                PaymentStatus = order.Payments.FirstOrDefault()?.Status ?? "UNKNOWN",
+                PaymentStatus = payment?.Status ?? "UNKNOWN",
+                Provider = payment?.Provider, // 🆕 thêm provider
                 Details = order.OrderDetails.Select(d => new OrderDetailResponse
                 {
                     ProductId = d.ProductId,
@@ -124,29 +137,35 @@ namespace OHairGanic.BLL.Implementations
         public async Task<List<OrderResponse>> GetAllOrdersAsync()
         {
             var orders = await _unitOfWork.Orders.GetAllOrdersAsync();
-            return orders.Select(o => new OrderResponse
+            return orders.Select(o =>
             {
-                Id = o.Id,
-                UserId = o.UserId,
-                Status = o.Status,
-                CustomerName = o.User?.FullName ?? "Ẩn danh",
-                CreatedAt = o.CreatedAt,
-                TotalAmount = o.OrderDetails.Sum(d => d.Price * d.Quantity),
-                PaymentStatus = o.Payments.FirstOrDefault()?.Status ?? "UNKNOWN",
-                Details = o.OrderDetails.Select(d => new OrderDetailResponse
+                var payment = SelectPrimaryPayment(o.Payments);
+                return new OrderResponse
                 {
-                    ProductId = d.ProductId,
-                    ProductName = d.Product?.Name ?? "",
-                    Price = d.Price,
-                    Quantity = d.Quantity
-                }).ToList()
+                    Id = o.Id,
+                    UserId = o.UserId,
+                    Status = o.Status,
+                    CustomerName = o.User?.FullName ?? "Ẩn danh",
+                    CreatedAt = o.CreatedAt,
+                    TotalAmount = o.OrderDetails.Sum(d => d.Price * d.Quantity),
+                    PaymentStatus = payment?.Status ?? "UNKNOWN",
+                    Provider = payment?.Provider, // 🆕 đồng bộ luôn ở list
+                    Details = o.OrderDetails.Select(d => new OrderDetailResponse
+                    {
+                        ProductId = d.ProductId,
+                        ProductName = d.Product?.Name ?? "",
+                        Price = d.Price,
+                        Quantity = d.Quantity
+                    }).ToList()
+                };
             }).ToList();
         }
+
         public async Task<AdminUpdateStatusResponse> AdminUpdateStatusAsync(AdminUpdateStatusRequest request)
         {
             var order = await _unitOfWork.Orders.GetOrderByIdAsync(request.OrderId);
             if (order == null)
-                throw new Exception("Order not found.");
+                throw new KeyNotFoundException("Order not found."); // 🆕 thống nhất
 
             // Cập nhật trạng thái đơn hàng
             order.Status = request.OrderStatus;
@@ -174,6 +193,204 @@ namespace OHairGanic.BLL.Implementations
                 PaymentStatus = order.Payments.FirstOrDefault()?.Status ?? "UNKNOWN",
                 UpdatedAt = DateTime.UtcNow
             };
+        }
+
+        public async Task<List<OrderResponse>> GetOrdersByUserIdAsync(int userId)
+        {
+            var orders = await _unitOfWork.Orders.GetOrdersByUserIdAsync(userId);
+            return orders.Select(o =>
+            {
+                var payment = SelectPrimaryPayment(o.Payments);
+                return new OrderResponse
+                {
+                    Id = o.Id,
+                    UserId = o.UserId,
+                    CustomerName = o.User?.FullName ?? "Ẩn danh",
+                    Status = o.Status,
+                    CreatedAt = o.CreatedAt,
+                    TotalAmount = o.OrderDetails.Sum(d => d.Price * d.Quantity),
+                    PaymentStatus = payment?.Status ?? "UNKNOWN",
+                    Provider = payment?.Provider, // 🆕
+                    Details = o.OrderDetails.Select(d => new OrderDetailResponse
+                    {
+                        ProductId = d.ProductId,
+                        ProductName = d.Product?.Name ?? "",
+                        Price = d.Price,
+                        Quantity = d.Quantity
+                    }).ToList()
+                };
+            }).ToList();
+        }
+
+        public async Task<List<OrderResponse>> GetMyPaidOrdersAsync(int userId)
+        {
+            var orders = await _unitOfWork.Orders.GetOrdersByUserIdAndPaidAsync(userId);
+            return orders.Select(o =>
+            {
+                var payment = SelectPrimaryPayment(o.Payments);
+                return new OrderResponse
+                {
+                    Id = o.Id,
+                    UserId = o.UserId,
+                    CustomerName = o.User?.FullName ?? "Ẩn danh",
+                    Status = o.Status,
+                    CreatedAt = o.CreatedAt,
+                    TotalAmount = o.OrderDetails.Sum(d => d.Price * d.Quantity),
+                    PaymentStatus = payment?.Status ?? "UNKNOWN",
+                    Provider = payment?.Provider, // 🆕
+                    Details = o.OrderDetails.Select(d => new OrderDetailResponse
+                    {
+                        ProductId = d.ProductId,
+                        ProductName = d.Product?.Name ?? "",
+                        Price = d.Price,
+                        Quantity = d.Quantity
+                    }).ToList()
+                };
+            }).ToList();
+        }
+
+        public async Task<List<OrderResponse>> GetMyUnpaidOrdersAsync(int userId)
+        {
+            var orders = await _unitOfWork.Orders.GetOrdersByUserIdAndUnpaidAsync(userId);
+            return orders.Select(o =>
+            {
+                var payment = SelectPrimaryPayment(o.Payments);
+                return new OrderResponse
+                {
+                    Id = o.Id,
+                    UserId = o.UserId,
+                    CustomerName = o.User?.FullName ?? "Ẩn danh",
+                    Status = o.Status,
+                    CreatedAt = o.CreatedAt,
+                    TotalAmount = o.OrderDetails.Sum(d => d.Price * d.Quantity),
+                    PaymentStatus = payment?.Status ?? "UNKNOWN",
+                    Provider = payment?.Provider, // 🆕
+                    Details = o.OrderDetails.Select(d => new OrderDetailResponse
+                    {
+                        ProductId = d.ProductId,
+                        ProductName = d.Product?.Name ?? "",
+                        Price = d.Price,
+                        Quantity = d.Quantity
+                    }).ToList()
+                };
+            }).ToList();
+        }
+        public async Task<OrderResponse> CancelMyOrderAsync(int orderId, int currentUserId)
+        {
+            var order = await _unitOfWork.Orders.GetOrderByIdAsync(orderId);
+            if (order == null)
+                throw new KeyNotFoundException("Order not found.");
+
+            // Chỉ cho hủy đơn của chính mình
+            if (order.UserId != currentUserId)
+                throw new UnauthorizedAccessException("You can only cancel your own order.");
+
+            // Nếu đã thanh toán -> không cho hủy
+            if (order.Payments.Any(p => p.Status.Equals("PAID", StringComparison.OrdinalIgnoreCase)))
+                throw new InvalidOperationException("Cannot cancel an order that has already been paid.");
+
+            // Idempotent: nếu đã CANCELLED thì trả về luôn
+            if (order.Status.Equals("CANCELLED", StringComparison.OrdinalIgnoreCase))
+            {
+                var paymentSnap = order.Payments
+                    .OrderByDescending(p => p.PaidAt ?? DateTime.MinValue)
+                    .ThenByDescending(p => p.CreatedAt)
+                    .FirstOrDefault();
+
+                return new OrderResponse
+                {
+                    Id = order.Id,
+                    UserId = order.UserId,
+                    CustomerName = order.User?.FullName ?? "Ẩn danh",
+                    Status = order.Status,
+                    CreatedAt = order.CreatedAt,
+                    TotalAmount = order.OrderDetails.Sum(d => d.Price * d.Quantity),
+                    PaymentStatus = paymentSnap?.Status ?? "UNKNOWN",
+                    Provider = paymentSnap?.Provider,
+                    Details = order.OrderDetails.Select(d => new OrderDetailResponse
+                    {
+                        ProductId = d.ProductId,
+                        ProductName = d.Product?.Name ?? "",
+                        Price = d.Price,
+                        Quantity = d.Quantity
+                    }).ToList()
+                };
+            }
+
+            // Đổi trạng thái đơn
+            order.Status = "CANCELLED";
+
+            // Update payment: UNPAID -> CANCELLED (nếu muốn)
+            foreach (var pay in order.Payments)
+            {
+                if (pay.Status.Equals("UNPAID", StringComparison.OrdinalIgnoreCase))
+                    pay.Status = "CANCELLED";
+            }
+
+            // Restock: cộng trả tồn kho cho các sản phẩm của đơn (chỉ khi chưa thanh toán)
+            foreach (var d in order.OrderDetails)
+            {
+                var prod = d.Product;
+                if (prod != null)
+                {
+                    prod.Stock += d.Quantity;
+                    if (prod.Stock > 0) prod.IsActive = true;
+                    await _unitOfWork.Products.UpdateProductAsync(prod);
+                }
+            }
+
+            await _unitOfWork.SaveAsync();
+
+            var payment = order.Payments
+                .OrderByDescending(p => p.PaidAt ?? DateTime.MinValue)
+                .ThenByDescending(p => p.CreatedAt)
+                .FirstOrDefault();
+
+            return new OrderResponse
+            {
+                Id = order.Id,
+                UserId = order.UserId,
+                CustomerName = order.User?.FullName ?? "Ẩn danh",
+                Status = order.Status,
+                CreatedAt = order.CreatedAt,
+                TotalAmount = order.OrderDetails.Sum(d => d.Price * d.Quantity),
+                PaymentStatus = payment?.Status ?? "UNKNOWN",
+                Provider = payment?.Provider,
+                Details = order.OrderDetails.Select(d => new OrderDetailResponse
+                {
+                    ProductId = d.ProductId,
+                    ProductName = d.Product?.Name ?? "",
+                    Price = d.Price,
+                    Quantity = d.Quantity
+                }).ToList()
+            };
+        }
+        public async Task<List<OrderResponse>> GetMyCancelledOrdersAsync(int userId)
+        {
+            var orders = await _unitOfWork.Orders.GetOrdersByUserIdAndCancelledAsync(userId);
+
+            return orders.Select(o =>
+            {
+                var payment = SelectPrimaryPayment(o.Payments);
+                return new OrderResponse
+                {
+                    Id = o.Id,
+                    UserId = o.UserId,
+                    CustomerName = o.User?.FullName ?? "Ẩn danh",
+                    Status = o.Status,
+                    CreatedAt = o.CreatedAt,
+                    TotalAmount = o.OrderDetails.Sum(d => d.Price * d.Quantity),
+                    PaymentStatus = payment?.Status ?? "UNKNOWN",
+                    Provider = payment?.Provider,
+                    Details = o.OrderDetails.Select(d => new OrderDetailResponse
+                    {
+                        ProductId = d.ProductId,
+                        ProductName = d.Product?.Name ?? "",
+                        Price = d.Price,
+                        Quantity = d.Quantity
+                    }).ToList()
+                };
+            }).ToList();
         }
 
     }

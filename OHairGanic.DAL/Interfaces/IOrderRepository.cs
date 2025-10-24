@@ -13,5 +13,10 @@ namespace OHairGanic.DAL.Interfaces
         Task<Order> GetOrderByIdAsync(int id);
         Task<List<Order>> GetAllOrdersAsync();
         Task<List<Order>> GetPaidOrdersAsync();
+
+        Task<List<Order>> GetOrdersByUserIdAsync(int userId);
+        Task<List<Order>> GetOrdersByUserIdAndPaidAsync(int userId);
+        Task<List<Order>> GetOrdersByUserIdAndUnpaidAsync(int userId);
+        Task<List<Order>> GetOrdersByUserIdAndCancelledAsync(int userId);
     }
 }

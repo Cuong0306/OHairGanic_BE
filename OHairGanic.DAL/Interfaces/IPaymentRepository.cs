@@ -12,5 +12,6 @@ namespace OHairGanic.DAL.Interfaces
         Task AddPaymentAsync(Payment payment);
         Task<Payment> GetPaymentByIdAsync(long id);
         Task<List<Payment>> GetPaymentsByOrderIdAsync(int orderId);
+        Task<List<Payment>> GetAllPaymentsAsync();
     }
 }

@@ -104,5 +104,45 @@ namespace OHairGanic.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        // ==================== LỌC THEO KÝ TỰ ĐẦU ====================
+        [Authorize]
+        [HttpGet(ApiRoutes.Product.GetByInitial)]
+        public async Task<IActionResult> GetByInitial([FromRoute] string? initial)
+        {
+            try
+            {
+                // Không truyền -> trả all
+                if (string.IsNullOrWhiteSpace(initial))
+                {
+                    var all = await _productService.GetAllProductsAsync();
+                    if (all == null || !all.Any())
+                        return NotFound(new { message = "No available products." });
+                    return Ok(all);
+                }
+
+                // Lấy đúng 1 ký tự đầu để lọc
+                char first = initial.Trim()[0];
+
+                var list = await _productService.GetProductsByInitialAsync(first);
+
+                // Fallback: không có kết quả -> trả all
+                if (list == null || list.Count == 0)
+                {
+                    var all = await _productService.GetAllProductsAsync();
+                    if (all == null || !all.Any())
+                        return NotFound(new { message = "No available products." });
+                    return Ok(all);
+                }
+
+                return Ok(list);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+
     }
 }

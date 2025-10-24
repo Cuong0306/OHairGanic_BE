@@ -1,29 +1,67 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿// OHairGanic.API/Controllers/UserController.cs
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OHairGanic.BLL.Interfaces;
 using OHairGanic.DTO.Constants;
 using OHairGanic.DTO.Requests;
+using System.Security.Claims;
 
 namespace OHairGanic.API.Controllers
 {
-    
     [ApiController]
     public class UserController : ControllerBase
     {
         private readonly IUserService _userService;
-        public UserController(IUserService userService)
+        public UserController(IUserService userService) => _userService = userService;
+
+        // ====== ME APIs ======
+
+        // GET /api/user/me
+        [Authorize]
+        [HttpGet]
+        [Route(ApiRoutes.Users.GetMe)]
+        public async Task<IActionResult> GetMe()
         {
-            _userService = userService;
+            try
+            {
+                var userId = RequireUserId();
+                var me = await _userService.GetMeAsync(userId);
+                return Ok(me);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
+
+        // PUT /api/user/me
+        // User chỉ được cập nhật thông tin cá nhân (không đổi role/status)
+        [Authorize]
+        [HttpPut]
+        [Route(ApiRoutes.Users.UpdateMe)]
+        public async Task<IActionResult> UpdateMe([FromBody] UpdateMeRequest dto)
+        {
+            if (!ModelState.IsValid) return BadRequest(ModelState);
+            try
+            {
+                var userId = RequireUserId();
+                var me = await _userService.UpdateMeAsync(userId, dto);
+                return Ok(me);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        // ====== ADMIN/STAFF APIs (giữ nguyên của bạn) ======
+
         [Authorize]
         [HttpPut]
         [Route(ApiRoutes.Users.Update)]
-        public async Task<IActionResult> UpdateUser(UpdateUserRequest dto)
+        public async Task<IActionResult> UpdateUser([FromBody] UpdateUserRequest dto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
-
+            if (!ModelState.IsValid) return BadRequest(ModelState);
             try
             {
                 var success = await _userService.UpdateUserAsync(dto);
@@ -35,22 +73,14 @@ namespace OHairGanic.API.Controllers
             }
         }
 
-
-        /// <summary>
-        /// Deletes a user 
-        /// </summary>
-        /// <param name="id">The ID of the user to delete</param>
         [Authorize]
         [HttpDelete]
         [Route(ApiRoutes.Users.Delete)]
         public async Task<IActionResult> SoftDeleteUser(int id)
         {
-
             try
             {
-                if (id <= 0)
-                    return BadRequest("Invalid user ID");
-
+                if (id <= 0) return BadRequest("Invalid user ID");
                 var success = await _userService.SoftDeleteUserAsync(id);
                 return success ? Ok("User deleted successfully") : NotFound("User not found or already deleted");
             }
@@ -60,12 +90,6 @@ namespace OHairGanic.API.Controllers
             }
         }
 
-
-        /// <summary>
-        /// Hard deletes a user from database
-        /// </summary>
-        /// <param name="userId">The ID of the user to delete</param>
-        /// 
         [Authorize]
         [HttpDelete]
         [Route(ApiRoutes.Users.HardDelete)]
@@ -73,8 +97,7 @@ namespace OHairGanic.API.Controllers
         {
             try
             {
-                if (userId <= 0)
-                    return BadRequest("Invalid user ID");
+                if (userId <= 0) return BadRequest("Invalid user ID");
                 var success = await _userService.HardDeleteUserAsync(userId);
                 return success ? Ok("User deleted successfully") : NotFound("User not found or already deleted");
             }
@@ -84,12 +107,6 @@ namespace OHairGanic.API.Controllers
             }
         }
 
-        /// <summary>
-        /// Get all active users
-        /// </summary>
-        /// <returns>List of users</returns>
-        /// 
-        //[Authorize(Roles = "Admin")]
         [Authorize]
         [HttpGet]
         [Route(ApiRoutes.Users.GetAll)]
@@ -99,11 +116,6 @@ namespace OHairGanic.API.Controllers
             return Ok(users);
         }
 
-        /// <summary>
-        /// Get a user by ID 
-        /// </summary>
-        /// <param name="id">The ID of the user to delete</param>
-        /// 
         [Authorize]
         [HttpGet]
         [Route(ApiRoutes.Users.GetById)]
@@ -118,6 +130,14 @@ namespace OHairGanic.API.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
+        }
+
+        // Helper: lấy userId từ JWT
+        private int RequireUserId()
+        {
+            var sub = User.FindFirstValue(ClaimTypes.NameIdentifier) ?? User.FindFirstValue("sub");
+            if (string.IsNullOrWhiteSpace(sub)) throw new Exception("Invalid userId in token");
+            return int.Parse(sub);
         }
     }
 }

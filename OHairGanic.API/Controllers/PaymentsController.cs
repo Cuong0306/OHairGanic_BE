@@ -1,14 +1,14 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Net.payOS;
+using Net.payOS.Types;
+using OHairGanic.BLL.Implementations;
+using OHairGanic.BLL.Interfaces;
+using OHairGanic.DTO.Config;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
-// PayOS SDK namespaces
-using Net.payOS.Types;
-using OHairGanic.BLL.Implementations;
-using OHairGanic.DTO.Config;
-using Net.payOS; // Các kiểu dữ liệu như PaymentData, ItemData [8, 9]
 
 namespace OHairGanic.API.Controllers
 {
@@ -56,7 +56,7 @@ namespace OHairGanic.API.Controllers
                 );
 
                 // 3. Gọi phương thức tạo link thanh toán [8]
-                CreatePaymentResult createPayment = await _payOS.createPaymentLink(paymentData); 
+                CreatePaymentResult createPayment = await _payOS.createPaymentLink(paymentData);
 
                 // 4. Trả về Checkout URL cho người dùng [10]
                 return Ok(new
@@ -114,6 +114,39 @@ namespace OHairGanic.API.Controllers
             }
 
             return Ok(new { message = "Webhook verified and processed" });
+        }
+    
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            var result = await _paymentService.GetAllPaymentsAsync();
+            return Ok(result);
+        }
+
+        // ✅ Xem chi tiết theo ID thanh toán
+        [Authorize]
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            try
+            {
+                var result = await _paymentService.GetPaymentByIdAsync(id);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
+        // ✅ Xem tất cả thanh toán của 1 đơn hàng
+        [Authorize]
+        [HttpGet("order/{orderId}")]
+        public async Task<IActionResult> GetByOrderId(int orderId)
+        {
+            var result = await _paymentService.GetPaymentsByOrderIdAsync(orderId);
+            return Ok(result);
         }
     }
 }

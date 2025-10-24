@@ -97,5 +97,129 @@ namespace OHairGanic.API.Controllers
                 return Problem(title: "Update Failed", detail: ex.Message, statusCode: 400);
             }
         }
+        [Authorize]
+        [HttpGet(ApiRoutes.Order.GetMine)]
+        public async Task<IActionResult> GetMine()
+        {
+            var userIdStr =
+                User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
+                User.FindFirst("nameid")?.Value ??
+                User.FindFirst("sub")?.Value ??
+                User.Identity?.Name;
+
+            if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out var currentUserId))
+                return Unauthorized(new { message = "User not authenticated." });
+
+            var result = await _orderService.GetOrdersByUserIdAsync(currentUserId);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpGet(ApiRoutes.Order.GetByUserId)]
+        public async Task<IActionResult> GetByUserId(int userId)
+        {
+            var userIdStr = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value
+                            ?? User.FindFirst("nameid")?.Value
+                            ?? User.FindFirst("sub")?.Value
+                            ?? User.Identity?.Name;
+
+            if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out var currentUserId))
+                return Unauthorized(new { message = "User not authenticated." });
+
+            // FIX: đọc role từ cả ClaimTypes.Role và "role"
+            var role = User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value
+                       ?? User.FindFirst("role")?.Value
+                       ?? "";
+            var isAdmin = string.Equals(role, "ADMIN", StringComparison.OrdinalIgnoreCase)
+                       || string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase);
+
+            if (!isAdmin && currentUserId != userId)
+                return Forbid();
+
+            var result = await _orderService.GetOrdersByUserIdAsync(userId);
+            return Ok(result);
+        }
+        [Authorize]
+        [HttpGet(ApiRoutes.Order.GetMyPaid)]
+        public async Task<IActionResult> GetMyPaid()
+        {
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                            ?? User.FindFirst("nameid")?.Value
+                            ?? User.FindFirst("sub")?.Value
+                            ?? User.Identity?.Name;
+
+            if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out var currentUserId))
+                return Unauthorized(new { message = "User not authenticated." });
+
+            var result = await _orderService.GetMyPaidOrdersAsync(currentUserId);
+            return Ok(result);
+        }
+
+        [Authorize]
+        [HttpGet(ApiRoutes.Order.GetMyUnpaid)]
+        public async Task<IActionResult> GetMyUnpaid()
+        {
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                            ?? User.FindFirst("nameid")?.Value
+                            ?? User.FindFirst("sub")?.Value
+                            ?? User.Identity?.Name;
+
+            if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out var currentUserId))
+                return Unauthorized(new { message = "User not authenticated." });
+
+            var result = await _orderService.GetMyUnpaidOrdersAsync(currentUserId);
+            return Ok(result);
+        }
+        [Authorize]
+        [HttpPut(ApiRoutes.Order.CancelMine)]
+        public async Task<IActionResult> CancelMine(int id)
+        {
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                            ?? User.FindFirst("nameid")?.Value
+                            ?? User.FindFirst("sub")?.Value
+                            ?? User.Identity?.Name;
+
+            if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out var currentUserId))
+                return Unauthorized(new { message = "User not authenticated." });
+
+            try
+            {
+                var result = await _orderService.CancelMyOrderAsync(id, currentUserId);
+                return Ok(result);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Ví dụ: đã thanh toán thì không hủy được
+                return Conflict(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return Problem(title: "Cancel Failed", detail: ex.Message, statusCode: 500);
+            }
+        }
+        [Authorize]
+        [HttpGet(ApiRoutes.Order.GetMyCancelled)]
+        public async Task<IActionResult> GetMyCancelled()
+        {
+            var userIdStr = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                            ?? User.FindFirst("nameid")?.Value
+                            ?? User.FindFirst("sub")?.Value
+                            ?? User.Identity?.Name;
+
+            if (string.IsNullOrEmpty(userIdStr) || !int.TryParse(userIdStr, out var currentUserId))
+                return Unauthorized(new { message = "User not authenticated." });
+
+            var result = await _orderService.GetMyCancelledOrdersAsync(currentUserId);
+            return Ok(result);
+        }
+
     }
 }

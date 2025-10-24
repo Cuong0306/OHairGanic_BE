@@ -12,7 +12,7 @@
         public DateTime? PaidAt { get; set; }
 
         // ✅ thêm 2 field này cho PayOS
-        public string QrPayload { get; set; }
-        public string QrImagePath { get; set; }
+        //public string QrPayload { get; set; }
+        //public string QrImagePath { get; set; }
     }
 }

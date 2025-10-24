@@ -9,7 +9,7 @@ namespace OHairGanic.DTO.Requests
     public class CreateOrderRequest
     {
         public List<OrderItemDto> Items { get; set; } = new List<OrderItemDto>();
-        public string? Provider { get; set; }  // Momo, ZaloPay, Cash,...
+        public string? Provider { get; set; } 
     }
 
     public class OrderItemDto

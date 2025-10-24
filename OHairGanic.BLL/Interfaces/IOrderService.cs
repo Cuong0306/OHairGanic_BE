@@ -14,6 +14,10 @@ namespace OHairGanic.BLL.Interfaces
         Task<OrderResponse> GetOrderByIdAsync(int id);
         Task<List<OrderResponse>> GetAllOrdersAsync();
         Task<AdminUpdateStatusResponse> AdminUpdateStatusAsync(AdminUpdateStatusRequest request);
-
+        Task<List<OrderResponse>> GetOrdersByUserIdAsync(int userId);
+        Task<List<OrderResponse>> GetMyPaidOrdersAsync(int userId);
+        Task<List<OrderResponse>> GetMyUnpaidOrdersAsync(int userId);
+        Task<OrderResponse> CancelMyOrderAsync(int orderId, int currentUserId);
+        Task<List<OrderResponse>> GetMyCancelledOrdersAsync(int userId);
     }
 }

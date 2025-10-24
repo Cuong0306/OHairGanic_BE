@@ -13,5 +13,11 @@ namespace OHairGanic.DAL.Interfaces
         Task<Analysis?> GetAnalyzeByIdAsync(int analyzeId);
         Task<bool> AddAnalyzeAsync(Analysis analyze);
         Task<bool> DeleteAnalyzeAsync(int analyzeId);
+        Task<List<Analysis>> GetDailyAnalysesAsync(int userId, DateTime start, DateTime end);
+        Task<List<Analysis>> GetAnalysesByUserIdAsync(int userId);
+        Task<List<Analysis>> GetAnalysesByUserInRangeAsync(int userId, DateTime start, DateTime end);
+        Task<List<Analysis>> GetAnalysesInRangeAsync(DateTime start, DateTime end);
+
+
     }
 }

@@ -14,7 +14,9 @@ namespace OHairGanic.BLL.Interfaces
         Task<bool> UpdateUserAsync(UpdateUserRequest dto);
         Task<bool> SoftDeleteUserAsync(int userId);
         Task<List<UserResponse>> GetAllUsersAsync();
-        Task<User> GetByIdAsync(int id);
+        Task<GetUserByIdResponse> GetByIdAsync(int id);
         Task<bool> HardDeleteUserAsync(int id);
+        Task<GetUserByIdResponse> GetMeAsync(int userId);
+        Task<GetUserByIdResponse> UpdateMeAsync(int userId, UpdateMeRequest dto);
     }
 }

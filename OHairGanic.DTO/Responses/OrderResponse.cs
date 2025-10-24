@@ -14,6 +14,7 @@ namespace OHairGanic.DTO.Responses
         public string CustomerName { get; set; }
         public DateTime CreatedAt { get; set; }
         public float TotalAmount { get; set; }
+        public string? Provider { get; set; }
         public string PaymentStatus { get; set; }
         public List<OrderDetailResponse> Details { get; set; } = new();
     }

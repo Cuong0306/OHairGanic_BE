@@ -22,6 +22,13 @@ namespace OHairGanic.DAL.Implementations
             await _context.Payments.AddAsync(payment);
         }
 
+        public async Task<List<Payment>> GetAllPaymentsAsync()
+        {
+            return await _context.Payments
+                .Include(p => p.Order)
+                .ToListAsync();
+        }
+
         public async Task<Payment> GetPaymentByIdAsync(long id)
         {
             return await _context.Payments

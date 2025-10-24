@@ -13,5 +13,7 @@ namespace OHairGanic.DAL.Interfaces
         Task<bool> AddProductAsync(Product product);
         Task<bool> UpdateProductAsync(Product product);
         Task<bool> DeleteProductAsync(int productId);
+
+        Task<List<Product>> GetProductsByInitialAsync(char initial);
     }
 }

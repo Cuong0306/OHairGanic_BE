@@ -154,5 +154,22 @@ namespace OHairGanic.BLL.Implementations
                 IsActive = product.IsActive
             };
         }
+        public async Task<List<ProductResponse>> GetProductsByInitialAsync(char initial)
+        {
+            var products = await _unitOfWork.Products.GetProductsByInitialAsync(initial);
+
+            return products.Select(p => new ProductResponse
+            {
+                ProductId = p.Id,
+                ProductName = p.Name,
+                Tags = p.Tags,
+                Price = p.Price,
+                ImageUrl = p.ImageUrl,
+                Stock = p.Stock,
+                CreatedAt = p.CreatedAt, // (nhỏ) bạn nên map từ DB, đừng dùng UtcNow ở GetAll
+                IsActive = p.IsActive
+            }).ToList();
+        }
+
     }
 }

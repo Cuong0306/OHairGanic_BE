@@ -95,5 +95,17 @@ namespace OHairGanic.DAL.Implementations
             _context.Products.Update(existing);
             return await _context.SaveChangesAsync() > 0;
         }
+
+        public async Task<List<Product>> GetProductsByInitialAsync(char initial)
+        {
+            string up = char.ToUpperInvariant(initial).ToString();
+            string low = char.ToLowerInvariant(initial).ToString();
+
+            return await _context.Products
+                .Where(p => p.Name != null &&
+                            (p.Name.StartsWith(up) || p.Name.StartsWith(low)))
+                .ToListAsync();
+        }
+
     }
 }

@@ -16,5 +16,6 @@ namespace OHairGanic.BLL.Interfaces
         Task<ProductResponse> AddProductAsync(CreateProductRequest dto);
         Task<ProductResponse> UpdateProductAsync(int id, UpdateProductRequest dto);
         Task<bool> DeleteProductAsync(int id);
+        Task<List<ProductResponse>> GetProductsByInitialAsync(char initial);
     }
 }
