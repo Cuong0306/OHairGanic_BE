@@ -1,0 +1,94 @@
+# =========================
+# OS junk
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# Visual Studio / .NET
+# =========================
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.rsuser
+*.vsidx
+
+# Build outputs
+[Bb]in/
+[Oo]bj/
+out/
+publish/
+artifacts/
+GeneratedFiles/
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+*.opencover.xml
+
+# NuGet
+packages/
+*.nupkg
+*.snupkg
+.nuget/
+
+# Rider / JetBrains
+.idea/
+*.iws
+*.iml
+*.ipr
+.ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# VS Code (giữ lại file cấu hình nếu muốn)
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# dotnet user secrets / local config
+*.userprefs
+*.local.json
+secrets.json
+**/Properties/launchSettings.json
+
+# EF Core
+# (Nếu bạn muốn commit migrations thì KHÔNG ignore thư mục này)
+# Migrations/
+
+# Logs
+[Ll]og/
+[Ll]ogs/
+*.log
+
+# Coverage
+coverage/
+.coverage/
+.coveragexml
+
+# =========================
+# Node / Frontend (nếu có)
+# =========================
+node_modules/
+**/node_modules/
+dist/
+build/
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# =========================
+# Docker / Compose
+# =========================
+.env
+docker-compose.override.yml
+
+# =========================
+# Python (nếu có)
+# =========================
+__pycache__/
+*.pyc
