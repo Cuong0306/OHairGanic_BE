@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿// OHairGanic.API/Controllers/AnalyzeController.cs
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OHairGanic.BLL.Interfaces;
 using OHairGanic.DTO.Constants;
 using OHairGanic.DTO.Requests;
+using System.Globalization;
 using System.Security.Claims;
 
 namespace OHairGanic.API.Controllers
@@ -24,7 +26,7 @@ namespace OHairGanic.API.Controllers
             _captureService = captureService;
         }
 
-        // ✅ POST: api/analyzes/by-url
+        // POST: api/analyzes/by-url
         [Authorize]
         [HttpPost(ApiRoutes.Analyze.AnalyzeByUrl)]
         public async Task<IActionResult> AnalyzeFromUrlAndSaveAsync([FromBody] AnalyzeByUrlRequest dto)
@@ -63,7 +65,7 @@ namespace OHairGanic.API.Controllers
             }
         }
 
-        // ✅ GET: api/analyzes/daily
+        // (giữ cũ nếu cần) GET: api/analyzes/daily
         [Authorize]
         [HttpGet(ApiRoutes.Analyze.GetDaily)]
         public async Task<IActionResult> GetDailyAnalysesAsync()
@@ -82,7 +84,65 @@ namespace OHairGanic.API.Controllers
             }
         }
 
-        // ✅ GET: api/analyzes (Admin)
+        // ✅ GET: api/analyzes/mine/daily
+        [Authorize]
+        [HttpGet(ApiRoutes.Analyze.GetMineDaily)]
+        public async Task<IActionResult> GetMyDailyAnalysesAsync()
+        {
+            try
+            {
+                int userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)
+                                       ?? throw new Exception("Invalid userId in token"));
+
+                var result = await _analyzeService.GetDailyAnalysesAsync(userId);
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [Authorize]
+        [HttpGet(ApiRoutes.Analyze.FilterMine)]
+        public async Task<IActionResult> FilterMine(
+    [FromQuery] string? from,
+    [FromQuery] string? to)
+        {
+            try
+            {
+                var currentUserId = int.Parse(
+                    User.FindFirstValue(ClaimTypes.NameIdentifier)
+                    ?? User.FindFirstValue("sub")
+                    ?? User.FindFirstValue("nameid")
+                    ?? throw new Exception("Invalid userId in token"));
+
+                var result = await _analyzeService.FilterAnalysesAsync(
+                    targetUserId: null,     // ✅ tự gắn ID: dùng currentUserId bên dưới
+                    from: from,             // hỗ trợ YYYY | YYYY-MM | YYYY-MM-DD
+                    to: to,                 // tùy chọn
+                    isAdmin: false,         // mine nên luôn false
+                    currentUserId: currentUserId
+                );
+
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid(ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+
+        // Admin
         [Authorize]
         [HttpGet(ApiRoutes.Analyze.GetAll)]
         public async Task<IActionResult> GetAllAsync()
@@ -91,7 +151,7 @@ namespace OHairGanic.API.Controllers
             return Ok(list);
         }
 
-        // ✅ GET: api/analyzes/{id}
+        // GET: api/analyzes/{id}
         [Authorize]
         [HttpGet(ApiRoutes.Analyze.GetById)]
         public async Task<IActionResult> GetByIdAsync(int id)
@@ -103,7 +163,7 @@ namespace OHairGanic.API.Controllers
             return Ok(result);
         }
 
-        // ✅ GET: api/analyzes/by-user/{userId}
+        // (giữ nếu cần) GET: api/analyzes/by-user/{userId}
         [Authorize]
         [HttpGet(ApiRoutes.Analyze.GetByUserId)]
         public async Task<IActionResult> GetByUserIdAsync(int userId)
@@ -111,17 +171,14 @@ namespace OHairGanic.API.Controllers
             var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
             var role = User.FindFirstValue(ClaimTypes.Role);
 
-            if (role != "Admin" && currentUserId != userId)
+            if (!string.Equals(role, "Admin", StringComparison.OrdinalIgnoreCase) && currentUserId != userId)
                 return Forbid("You can only view your own analyses.");
 
             var result = await _analyzeService.GetAnalysesByUserIdAsync(userId);
             return Ok(result);
         }
 
-        // ✅ GET: /api/analyzes/filter?from=2025-10&to=2025-11&userId=3
-        // ✅ GET: /api/analyzes/filter?from=2025&to=2025-03
-        // ✅ GET: /api/analyzes/filter?from=2025-10-01&to=2025-10-24
-        // ✅ GET: /api/analyzes/filter  (không tham số -> ALL của user hiện tại)
+        // (tuỳ: giữ filter cũ để tương thích; có thể đánh dấu [Obsolete])
         [Authorize]
         [HttpGet(ApiRoutes.Analyze.Filter)]
         public async Task<IActionResult> Filter(
@@ -159,5 +216,11 @@ namespace OHairGanic.API.Controllers
             }
         }
 
+        private static DateOnly ParseDay(string s)
+        {
+            if (DateOnly.TryParseExact(s, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var d))
+                return d;
+            throw new FormatException("Sai định dạng ngày. Dùng yyyy-MM-dd.");
+        }
     }
 }

@@ -20,7 +20,6 @@ namespace OHairGanic.DTO.Constants
             public const string Update = $"{Base}/products/{{id}}";
             public const string Delete = $"{Base}/products/{{id}}";
             public const string Upload = $"{Base}/products/upload";
-
             public const string GetByInitial = $"{Base}/products/initial/{{initial?}}";
         }
 
@@ -37,24 +36,26 @@ namespace OHairGanic.DTO.Constants
         {
             public const string Base = $"{ApiRoutes.Base}/analyzes";
 
-            // POST: phân tích ảnh từ URL
+            // Phân tích ảnh từ URL
             public const string AnalyzeByUrl = $"{Base}/by-url";
 
-            // GET: lấy toàn bộ (Admin)
+            // Admin
             public const string GetAll = Base;
-
-            // GET: lấy theo id
             public const string GetById = $"{Base}/{{id}}";
+            public const string GetByUserId = $"{Base}/by-user/{{userId}}"; // giữ nếu cần
 
-            // GET: lấy theo userId (Admin hoặc chính user)
-            public const string GetByUserId = $"{Base}/by-user/{{userId}}";
-
-            // GET: lấy daily (user)
+            // Cũ (giữ nếu muốn tương thích)
             public const string GetDaily = $"{Base}/daily";
-
             public const string Filter = $"{Base}/filter";
-        }
 
+            // ✅ Mới: chỉ lấy của chính mình
+            public const string GetMineDaily = $"{Base}/mine/daily";
+
+            // ✅ Mới: filter theo ngày, của chính mình
+            // GET /api/analyzes/mine/filter?date=yyyy-MM-dd
+            // hoặc /api/analyzes/mine/filter?from=yyyy-MM-dd&to=yyyy-MM-dd
+            public const string FilterMine = $"{Base}/mine/filter";
+        }
 
         public static class Order
         {
@@ -64,7 +65,6 @@ namespace OHairGanic.DTO.Constants
             public const string AdminUpdateStatus = $"{Base}/orders/admin/update-status";
             public const string GetByUserId = $"{Base}/users/{{userId}}/orders";
             public const string GetMine = $"{Base}/orders/mine";
-
             public const string GetMyPaid = $"{Base}/orders/mine/paid";
             public const string GetMyUnpaid = $"{Base}/orders/mine/unpaid";
             public const string CancelMine = $"{Base}/orders/{{id}}/cancel";
@@ -82,12 +82,9 @@ namespace OHairGanic.DTO.Constants
         public static class Users
         {
             public const string BaseUser = $"{Base}/user";
-
-            // Me endpoints (MỚI)
             public const string GetMe = $"{BaseUser}/me";
             public const string UpdateMe = $"{BaseUser}/me";
 
-            // Admin/staff endpoints (đã có)
             public const string Create = $"{Base}/create";
             public const string GetAll = $"{BaseUser}/all";
             public const string GetById = $"{BaseUser}/{{id}}";
