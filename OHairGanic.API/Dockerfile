@@ -8,16 +8,21 @@ COPY OHairGanic.BLL/OHairGanic.BLL.csproj OHairGanic.BLL/
 COPY OHairGanic.DAL/OHairGanic.DAL.csproj OHairGanic.DAL/
 COPY OHairGanic.DTO/OHairGanic.DTO.csproj OHairGanic.DTO/
 
+# Add packages to BLL project before restore to cache them
+WORKDIR /src/OHairGanic.BLL
+RUN dotnet add package Microsoft.ML.OnnxRuntime --version 1.19.2 && \
+    dotnet add package SixLabors.ImageSharp --version 3.1.4
+
+# Restore all dependencies (cached layer)
+WORKDIR /src
 RUN dotnet restore OHairGanic.API/OHairGanic.API.csproj
 
 # copy toàn bộ source
 COPY . .
 WORKDIR /src/OHairGanic.API
 
-# ✅ THÊM 4 DÒNG NÀY — để cài thư viện AI trước khi publish
-RUN dotnet add ../OHairGanic.BLL package Microsoft.ML.OnnxRuntime --version 1.19.2 && \
-    dotnet add ../OHairGanic.BLL package SixLabors.ImageSharp --version 3.1.4 && \
-    dotnet publish -c Release -o /out --no-restore /p:UseAppHost=false
+# Publish without restore (dependencies already cached)
+RUN dotnet publish -c Release -o /out --no-restore /p:UseAppHost=false
 
 # ===== Runtime =====
 FROM mcr.microsoft.com/dotnet/aspnet:8.0

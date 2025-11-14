@@ -1,44 +1,44 @@
 ﻿services:
-  ohairganic_api:
-    container_name: ohairganic_api_latest
-    image: ${REGISTRY}/ohairganicapi:latest
+  ohairganic-api:
+    container_name: ohairganic-api
+    image: ${REGISTRY}/ohairganic-api:latest
     restart: always
     build:
-      context: .                      
+      context: .
       dockerfile: OHairGanic.API/Dockerfile
+      cache_from:
+        - type=local,src=/tmp/.buildx-cache
     ports:
       - "${API_PORT}:8080"
-    networks:
-      - ohairganic-application
     environment:
       ASPNETCORE_ENVIRONMENT: "${ASPNETCORE_ENVIRONMENT:-Development}"
       ASPNETCORE_URLS: "http://0.0.0.0:8080"
-
-      # Kết nối SQL Server
-      ConnectionStrings__Default: "Server=sqlserver,1433;Database=OHairGanicDB;User Id=${DB_USER};Password=${DB_PASSWORD};Encrypt=True;TrustServerCertificate=True;Connect Timeout=30;ConnectRetryCount=3;ConnectRetryInterval=5;"
+      ConnectionStrings__Default: "Server=ohairganic-database,1433;Database=OHairGanicDB;User Id=${DB_USER};Password=${SA_PASSWORD};Encrypt=True;TrustServerCertificate=True;Connect Timeout=30;ConnectRetryCount=3;ConnectRetryInterval=5;"
     depends_on:
-      - sqlserver
+      - ohairganic-database
+    networks:
+      - ohairganic-application
 
-  sqlserver:
-    container_name: sqlserver
+  ohairganic-database:
+    container_name: ohairganic-database
     image: mcr.microsoft.com/mssql/server:2022-latest
     restart: always
     environment:
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: ${SA_PASSWORD}
-      MSSQL_PID: "Developer"
+      MSSQL_DB: "OHairGanicDB"
       TZ: "Asia/Ho_Chi_Minh"
     ports:
-      - "${DB_HOST_PORT}:1433"  
+      - "${DB_HOST_PORT}:1433"
     networks:
       - ohairganic-application
     volumes:
-      - sql_data:/var/opt/mssql/data
-      
+      - sql_data:/var/opt/mssql
+
 volumes:
   sql_data:
+    driver: local
 
 networks:
   ohairganic-application:
     name: ohairganic-application
-    external: true

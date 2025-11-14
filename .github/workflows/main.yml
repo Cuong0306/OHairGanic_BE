@@ -1,11 +1,11 @@
 name: Docker Build and Deploy
 on:
   push:
-    branches: 
-      - main
+    branches:
+    - main
   pull_request:
-    branches: 
-      - main
+    branches:
+    - main
 
 jobs:
   build-image:
@@ -15,7 +15,12 @@ jobs:
     permissions:
       contents: read
       packages: write
-
+    env:
+      API_PORT: ${{ secrets.API_PORT }}
+      DB_HOST_PORT: ${{ secrets.DB_HOST_PORT }}
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      SA_PASSWORD: ${{ secrets.SA_PASSWORD }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -23,13 +28,21 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
 
+    - name: Cache Docker layers
+      uses: actions/cache@v4
+      with:
+        path: /tmp/.buildx-cache
+        key: ${{ runner.os }}-buildx-${{ github.sha }}
+        restore-keys: |
+          ${{ runner.os }}-buildx-
+
     - name: Log in to Docker Hub
       uses: docker/login-action@v3
       with:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    
+
     - name: Lowercase repository name
       run: |
         REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
@@ -41,8 +54,16 @@ jobs:
 
     - name: Build and push
       run: |
-        docker compose -f docker-compose.yaml build ohairganic_api
-        docker compose -f docker-compose.yaml push ohairganic_api
+        export DOCKER_BUILDKIT=1
+        export COMPOSE_DOCKER_CLI_BUILD=1
+        export BUILDKIT_CACHE_MOUNT_NS=buildkit-cache
+        docker compose -f docker-compose.yaml build --build-arg BUILDKIT_INLINE_CACHE=1 ohairganic-api
+        docker compose -f docker-compose.yaml push ohairganic-api
+
+    - name: Move cache
+      run: |
+        rm -rf /tmp/.buildx-cache
+        mv /tmp/.buildx-cache-new /tmp/.buildx-cache || true
 
   deploy-server:
     defaults:
@@ -56,6 +77,12 @@ jobs:
     permissions:
       contents: read
       packages: write
+    env:
+      API_PORT: ${{ secrets.API_PORT }}
+      DB_HOST_PORT: ${{ secrets.DB_HOST_PORT }}
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      SA_PASSWORD: ${{ secrets.SA_PASSWORD }}
     steps:
     - name: Checkout repository
       uses: actions/checkout@v4
@@ -66,7 +93,7 @@ jobs:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-    
+
     - name: Lowercase repository name
       run: |
         $repoLower = "${{ github.repository }}".ToLower()
@@ -74,10 +101,11 @@ jobs:
 
     - name: Pull latest image
       run: |
-        docker compose -f docker-compose.yaml -p ohairganic_application pull ohairganic_api
+        docker compose -f docker-compose.yaml -p ohairganic_application pull
 
     - name: Deploy image
       run: |
-        docker compose -f docker-compose.yaml -p ohairganic_application up -d ohairganic_api
+        docker compose -f docker-compose.yaml -p ohairganic_application up -d
+
     - name: Cleanup old images
       run: docker image prune -a -f
