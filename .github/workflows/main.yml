@@ -69,8 +69,8 @@ jobs:
     
     - name: Lowercase repository name
       run: |
-        REPO_LOWER=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
-        echo "REGISTRY=ghcr.io/$REPO_LOWER" >> $GITHUB_ENV
+        $repoLower = "${{ github.repository }}".ToLower()
+        "REGISTRY=ghcr.io/$repoLower" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
 
     - name: Pull latest image
       run: |
