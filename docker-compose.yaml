@@ -1,27 +1,23 @@
 ﻿services:
   ohairganic_api:
     container_name: ohairganic_api_latest
-    image: cuong0306/ohairganicapi:latest
-    #image: cuong0306/ohairganicapi:latest
+    image: ${REGISTRY}/ohairganicapi:latest
     restart: always
     build:
       context: .                      
       dockerfile: OHairGanic.API/Dockerfile
     ports:
-      - "${API_PORT:-32770}:8080"     
+      - "${API_PORT}:8080"
     networks:
-      - demo-cloudflared
+      - ohairganic-application
     environment:
       ASPNETCORE_ENVIRONMENT: "${ASPNETCORE_ENVIRONMENT:-Development}"
       ASPNETCORE_URLS: "http://0.0.0.0:8080"
 
       # Kết nối SQL Server
-      ConnectionStrings__Default: "Server=sqlserver,1433;Database=OHairGanicDB;User Id=hosttest;Password=Aa123456!;Encrypt=True;TrustServerCertificate=True;Connect Timeout=30;ConnectRetryCount=3;ConnectRetryInterval=5;"
-      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=OHairGanicDB;User Id=hosttest;Password=Aa123456!;Encrypt=True;TrustServerCertificate=True;Connect Timeout=30;ConnectRetryCount=3;ConnectRetryInterval=5;"
-      ConnectionStrings__SqlServer: "Server=sqlserver,1433;Database=OHairGanicDB;User Id=hosttest;Password=Aa123456!;Encrypt=True;TrustServerCertificate=True;Connect Timeout=30;ConnectRetryCount=3;ConnectRetryInterval=5;"
-      DatabaseSettings__ConnectionString: "Server=sqlserver,1433;Database=OHairGanicDB;User Id=hosttest;Password=Aa123456!;Encrypt=True;TrustServerCertificate=True;Connect Timeout=30;ConnectRetryCount=3;ConnectRetryInterval=5;"
+      ConnectionStrings__Default: "Server=sqlserver,1433;Database=OHairGanicDB;User Id=${DB_USER};Password=${DB_PASSWORD};Encrypt=True;TrustServerCertificate=True;Connect Timeout=30;ConnectRetryCount=3;ConnectRetryInterval=5;"
     depends_on:
-      - sqlserver   # ✅ chỉ cần dòng này, không cần điều kiện "service_healthy"
+      - sqlserver
 
   sqlserver:
     container_name: sqlserver
@@ -29,19 +25,20 @@
     restart: always
     environment:
       ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: ${SA_PASSWORD:-Aa123456!}
+      MSSQL_SA_PASSWORD: ${SA_PASSWORD}
       MSSQL_PID: "Developer"
       TZ: "Asia/Ho_Chi_Minh"
     ports:
-      - "${DB_HOST_PORT:-1434}:1433"  
+      - "${DB_HOST_PORT}:1433"  
     networks:
-      - demo-cloudflared
+      - ohairganic-application
     volumes:
-      - sql_data:/var/opt/mssql
+      - sql_data:/var/opt/mssql/data
       
 volumes:
   sql_data:
 
 networks:
-  demo-cloudflared:
-    name: demo-cloudflared
+  ohairganic-application:
+    name: ohairganic-application
+    external: true

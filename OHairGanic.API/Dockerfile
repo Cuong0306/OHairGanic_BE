@@ -16,9 +16,8 @@ WORKDIR /src/OHairGanic.API
 
 # ✅ THÊM 4 DÒNG NÀY — để cài thư viện AI trước khi publish
 RUN dotnet add ../OHairGanic.BLL package Microsoft.ML.OnnxRuntime --version 1.19.2 && \
-    
     dotnet add ../OHairGanic.BLL package SixLabors.ImageSharp --version 3.1.4 && \
-    dotnet publish -c Release -o /out /p:UseAppHost=false
+    dotnet publish -c Release -o /out --no-restore /p:UseAppHost=false
 
 # ===== Runtime =====
 FROM mcr.microsoft.com/dotnet/aspnet:8.0

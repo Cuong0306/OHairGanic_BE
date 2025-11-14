@@ -52,10 +52,6 @@ builder.Services.Configure<PayOSSettings>(
     builder.Configuration.GetSection("PayOS"));
 builder.Services.AddHttpClient(); // cần thiết để call API PayOS
 
-// ================== DATABASE ==================
-builder.Services.AddDbContext<OHairGanicDBContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
 // ================== CORS ==================
 builder.Services.AddCors(options =>
 {
